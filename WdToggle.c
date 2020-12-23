@@ -150,7 +150,7 @@ DWORD ReadUBRFromRegistry() {
 	NTSTATUS Status = STATUS_UNSUCCESSFUL;
 	HANDLE regKeyHandle = NULL;
 	UNICODE_STRING RegistryKeyName;	
-    UNICODE_STRING KeyValueName;
+	UNICODE_STRING KeyValueName;
 	PKEY_VALUE_FULL_INFORMATION KeyValueInformation = NULL;
 	ULONG KeyResultLength = 0;
 	DWORD dwValueData = 0;
@@ -162,7 +162,7 @@ DWORD ReadUBRFromRegistry() {
 	}
 
 	RtlInitUnicodeString(&RegistryKeyName, L"\\Registry\\Machine\\Software\\Microsoft\\Windows NT\\CurrentVersion");
-    RtlInitUnicodeString(&KeyValueName, L"UBR");
+	RtlInitUnicodeString(&KeyValueName, L"UBR");
 
 	regKeyHandle = OpenRegKeyHandle(KEY_QUERY_VALUE, &RegistryKeyName);
 	if (regKeyHandle == NULL) {
@@ -180,7 +180,7 @@ DWORD ReadUBRFromRegistry() {
 		goto CleanUp;
 	}
 
-    dwValueData = *((DWORD*)((PUCHAR)&KeyValueInformation[0] + KeyValueInformation[0].DataOffset));
+	dwValueData = *((DWORD*)((PUCHAR)&KeyValueInformation[0] + KeyValueInformation[0].DataOffset));
 
 CleanUp:
 
@@ -323,7 +323,7 @@ VOID go(IN PCHAR Args, IN ULONG Length) {
 	
 	// Read UBR value from registry (we don't want to screw up lsass)
 	dwUBR = ReadUBRFromRegistry();
-    if (dwUBR != 0) {
+	if (dwUBR != 0) {
 		BeaconPrintf(CALLBACK_OUTPUT, "Windows version: %ls, OS build number: %u.%u\n", chOSMajorMinor, pPEB->OSBuildNumber, dwUBR);
 	}
 	else {
@@ -395,10 +395,10 @@ VOID go(IN PCHAR Args, IN ULONG Length) {
 		goto CleanUp;
 	}
 
-    if(!PSAPI$EnumProcessModules(hLsass, 0, 0, &cbNeeded)){
+	if(!PSAPI$EnumProcessModules(hLsass, 0, 0, &cbNeeded)){
         BeaconPrintf(CALLBACK_ERROR, "[!] Error: Failed to enumerate modules\n");
 		goto CleanUp;
-    }
+	}
 
 	hLsassDll = KERNEL32$HeapAlloc(KERNEL32$GetProcessHeap(), HEAP_ZERO_MEMORY, cbNeeded);
 	if (hLsassDll == NULL) {
