@@ -166,7 +166,7 @@ DWORD ReadUBRFromRegistry() {
 
 	regKeyHandle = OpenRegKeyHandle(KEY_QUERY_VALUE, &RegistryKeyName);
 	if (regKeyHandle == NULL) {
-        return 0;
+		return 0;
 	}
 
 	Status = ZwQueryValueKey(regKeyHandle, &KeyValueName, KeyValueFullInformation, NULL, 0, &KeyResultLength);
