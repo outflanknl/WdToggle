@@ -20,7 +20,9 @@ WINBASEAPI BOOL WINAPI KERNEL32$HeapFree (HANDLE, DWORD, PVOID);
 //MSVCRT
 WINBASEAPI int __cdecl MSVCRT$_wcsicmp(const wchar_t *_Str1, const wchar_t *_Str2);
 WINBASEAPI int __cdecl MSVCRT$swprintf_s(wchar_t *buffer, size_t sizeOfBuffer, const wchar_t *format, ...);
+WINBASEAPI int __cdecl MSVCRT$_vsnwprintf_s(wchar_t *buffer, size_t sizeOfBuffer, size_t count, const wchar_t *format, va_list argptr);
 DECLSPEC_IMPORT PCHAR __cdecl MSVCRT$strstr(const char *haystack, const char *needle);
+WINBASEAPI size_t __cdecl MSVCRT$wcslen(const wchar_t *_Str);
 WINBASEAPI void __cdecl MSVCRT$memset(void *dest, int c, size_t count);
 
 //ADVAPI32
@@ -29,6 +31,9 @@ WINADVAPI WINBOOL WINAPI ADVAPI32$LookupPrivilegeValueW(LPCWSTR lpSystemName, LP
 //PSAPI
 DECLSPEC_IMPORT WINBOOL WINAPI PSAPI$EnumProcessModules(HANDLE hProcess, HMODULE *lphModule, DWORD cb, LPDWORD lpcbNeeded);
 DECLSPEC_IMPORT DWORD WINAPI PSAPI$GetModuleFileNameExA(HANDLE hProcess, HMODULE hModule, LPSTR lpFilename, DWORD nSize);
+
+//OLE32
+DECLSPEC_IMPORT HRESULT WINAPI OLE32$CreateStreamOnHGlobal(HGLOBAL hGlobal, BOOL fDeleteOnRelease, LPSTREAM *ppstm);
 
 #define InitializeObjectAttributes( i, o, a, r, s ) {    \
       (i)->Length = sizeof( OBJECT_ATTRIBUTES );         \
@@ -247,6 +252,88 @@ typedef struct _KEY_VALUE_FULL_INFORMATION {
 	ULONG NameLength;
 	WCHAR Name[1];
 } KEY_VALUE_FULL_INFORMATION, *PKEY_VALUE_FULL_INFORMATION;
+
+EXTERN_C LPVOID GetTEBAsm64();
+
+EXTERN_C NTSTATUS ZwQuerySystemInformation(
+    SYSTEM_INFORMATION_CLASS SystemInformationClass,
+    PVOID SystemInformation,
+    ULONG SystemInformationLength,
+    PULONG ReturnLength
+    );
+
+EXTERN_C NTSTATUS ZwOpenProcess(
+    PHANDLE ProcessHandle, 
+    ACCESS_MASK DesiredAccess, 
+    POBJECT_ATTRIBUTES ObjectAttributes, 
+    PCLIENT_ID ClientId
+    );
+
+EXTERN_C NTSTATUS ZwAdjustPrivilegesToken(
+    IN HANDLE TokenHandle,
+    IN BOOLEAN DisableAllPrivileges,
+    IN PTOKEN_PRIVILEGES TokenPrivileges,
+    IN ULONG PreviousPrivilegesLength,
+    OUT PTOKEN_PRIVILEGES PreviousPrivileges OPTIONAL,
+    OUT PULONG RequiredLength OPTIONAL
+    );
+
+EXTERN_C NTSTATUS ZwAllocateVirtualMemory(
+    HANDLE ProcessHandle, 
+    PVOID *BaseAddress, 
+    ULONG_PTR ZeroBits, 
+    PSIZE_T RegionSize, 
+    ULONG AllocationType, 
+    ULONG Protect
+    );
+
+EXTERN_C NTSTATUS ZwFreeVirtualMemory(
+    HANDLE ProcessHandle, 
+    PVOID *BaseAddress, 
+    IN OUT PSIZE_T RegionSize, 
+    ULONG FreeType
+    );
+
+EXTERN_C NTSTATUS ZwReadVirtualMemory(
+    HANDLE hProcess, 
+    PVOID lpBaseAddress, 
+    PVOID lpBuffer, 
+    SIZE_T NumberOfBytesToRead, 
+    PSIZE_T NumberOfBytesRead
+    );
+
+EXTERN_C NTSTATUS ZwWriteVirtualMemory(
+    HANDLE hProcess, 
+    PVOID lpBaseAddress, 
+    PVOID lpBuffer, 
+    SIZE_T NumberOfBytesToWrite, 
+    PSIZE_T NumberOfBytesWrite
+    );
+
+EXTERN_C NTSTATUS ZwClose(
+    IN HANDLE KeyHandle
+    );
+
+EXTERN_C NTSTATUS ZwOpenKey(
+    IN HANDLE KeyHandle,
+    IN ULONG DesiredAccess,
+    IN POBJECT_ATTRIBUTES ObjectAttributes
+    );
+
+EXTERN_C NTSTATUS ZwQueryValueKey(
+    HANDLE KeyHandle,
+    PUNICODE_STRING ValueName,
+    KEY_VALUE_INFORMATION_CLASS KeyValueInformationClass,
+    PVOID KeyValueInformation,
+    ULONG Length,
+    PULONG ResultLength
+    );
+
+typedef NTSTATUS(NTAPI* _NtOpenProcessToken)(
+	IN HANDLE ProcessHandle,
+	IN ACCESS_MASK DesiredAccess,
+	OUT PHANDLE TokenHandle
+	);
 
 typedef void (WINAPI* _RtlInitUnicodeString)(
 	PUNICODE_STRING DestinationString,
